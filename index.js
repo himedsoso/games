@@ -1,3 +1,8 @@
+// notre modal au milieu de la fenetre
+const modale = document.querySelector('.start');
+const boutonModale = document.querySelector('.btnstart');
+const touche = document.querySelector('.touche');
+const boutonRestart = document.querySelector('.btnrestart');
 ////// CREATION DU CANVAS ET DU CONTEXTE /////////////////////////////////////////////
 const canvas = document.querySelector('#game-container');
 canvas.width = innerWidth;
@@ -38,14 +43,14 @@ class Projectile extends Player{
         this.y = this.y + this.velocity.y;
     }
 }
-const projectiles = [];
+let projectiles = [];
 ////////////// MA CLASSE ENNEMIES ///////////////////////////////////////////////////////////
 class Ennemies extends Projectile{
     constructor(x, y, radius, color, velocity){
 super(x, y, radius, color, velocity);
     }
 }
-const enemies = [];
+let enemies = [];
 /////////// MA CLASSE PARTICULES ////////////////////////////////////////////////////////
 class Particle extends Ennemies{
 constructor(x, y, radius, color, velocity){
@@ -68,7 +73,7 @@ draw() {
     this.alpha -= 0.01;
   }
 }
-const particles = [];
+let particles = [];
 ///////// MON EVENEMENT DE CLIQUE ///////////////////////////////////////////////////////
 window.addEventListener('click', (event) => {
     const angle = Math.atan2(
@@ -84,6 +89,9 @@ projectile.draw();
 projectiles.push(projectile);
 });
 ////////// MA FONCTION ANIMATE ////////////////////////////////////////////////////////////////////
+let score = 0;
+let scoco = document.querySelector('.parascore');
+scoco.innerHTML = score;
 let animationId;
 function animate() {
     animationId = requestAnimationFrame(animate);
@@ -127,6 +135,8 @@ for (let i = 0; i < 8; i++) {
       )
     );
   }
+score += 100;
+scoco.innerHTML = score;
                 if(ennemie.radius - 10 > 5){
                     gsap.to(ennemie, {
                         radius: ennemie.radius - 10,
@@ -141,11 +151,11 @@ projectiles.splice(projectileIndex, 1);
         const distance2 = Math.hypot(player.x - ennemie.x, player.y - ennemie.y);
         if (distance2 - player.radius - ennemie.radius <= 0) {
             cancelAnimationFrame(animationId);
+touche.style.display = 'flex';
          }
         ennemie.update()
     });
 }
-animate();
 //////////// MA FONCTION CREATION ENNEMIES //////////////////////////////////////////////////////////////////
 function spawnEnemies() {
     setInterval(() => {
@@ -177,4 +187,18 @@ function spawnEnemies() {
         enemies.push(new Ennemies(x, y, radius, color, velocity));
     }, 1000);
 }
-spawnEnemies();
+boutonModale.addEventListener('click', () => {
+    animate();
+    spawnEnemies();
+    modale.style.display = 'none';
+});
+boutonRestart.addEventListener('click', () => {
+    projectiles = [];
+    enemies = [];
+    particles = [];
+    score = 0;
+    scoco.innerText = score;
+    animate();
+    spawnEnemies();
+    touche.style.display = 'none';
+});
